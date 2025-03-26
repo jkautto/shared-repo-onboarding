@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Initialization script for shared resource access
+# Initialization script for accessing the shared tools repository
 # Usage: ./init_access.sh GITHUB_TOKEN
+
+set -e  # Exit immediately if a command fails
 
 if [ $# -ne 1 ]; then
     echo "Error: GitHub token required"
@@ -10,50 +12,73 @@ if [ $# -ne 1 ]; then
 fi
 
 TOKEN=$1
+PRIVATE_REPO="jkautto/kaut-shared"
+TARGET_DIR="./kaut-shared-tools"
 
-echo "Verifying access credentials..."
-# Verify token has access to the repository
-curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $TOKEN" https://api.github.com/repos/jkautto/kaut-shared > /tmp/curl_response.txt
-RESPONSE=$(cat /tmp/curl_response.txt)
-rm /tmp/curl_response.txt
+echo "======================================================"
+echo "  Shared Tools Access - Initialization Script"
+echo "======================================================"
+echo 
+echo "This script will clone the private repository:"
+echo "https://github.com/$PRIVATE_REPO"
+echo 
+echo "Verifying token access..."
 
-if [ "$RESPONSE" != "200" ]; then
-    echo "Error: Invalid token or repository access denied"
-    echo "HTTP response: $RESPONSE"
+# Test token access to the repository
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $TOKEN" "https://api.github.com/repos/$PRIVATE_REPO")
+
+if [ "$HTTP_STATUS" != "200" ]; then
+    echo "ERROR: Cannot access the private repository."
+    echo "Status code: $HTTP_STATUS"
+    echo 
+    echo "Possible reasons:"
+    echo "- Invalid GitHub token"
+    echo "- Token does not have access to $PRIVATE_REPO"
+    echo "- Repository doesn't exist or network issue"
+    echo 
+    echo "Please contact your system administrator."
     exit 1
 fi
 
-echo "Access verified successfully."
-echo "Cloning shared tools repository..."
+echo "✅ Token verified successfully!"
+echo "Creating target directory: $TARGET_DIR"
 
-# Create a target directory for the repository
-SHARED_DIR="./kaut-shared-tools"
-mkdir -p $SHARED_DIR
+# Create target directory (and parent directories if needed)
+mkdir -p "$TARGET_DIR"
 
-# Clone the repository using the token
-git clone https://oauth2:${TOKEN}@github.com/jkautto/kaut-shared.git $SHARED_DIR
+echo "Cloning private repository..."
+echo "https://github.com/$PRIVATE_REPO -> $TARGET_DIR"
 
-if [ $? -ne 0 ]; then
-    echo "Error: Failed to clone repository"
+# Clone the repository (quiet mode)
+git clone -q "https://oauth2:${TOKEN}@github.com/$PRIVATE_REPO" "$TARGET_DIR"
+
+if [ $? -eq 0 ]; then
+    echo 
+    echo "======================================================"
+    echo "✅ SUCCESS! Shared tools repository cloned successfully."
+    echo "======================================================"
+    echo 
+    echo "The shared tools are now available in: $TARGET_DIR"
+    echo 
+    echo "NEXT STEPS:"
+    echo "1. Read the documentation: $TARGET_DIR/docs/README.md"
+    echo "2. Set up aliases: source $TARGET_DIR/bin/setup_aliases.sh"
+    echo "3. Start using the tools"
+    echo 
+    echo "For help, see: $TARGET_DIR/docs/GETTING_STARTED.md"
+    echo "======================================================"
+else
+    echo 
+    echo "======================================================"
+    echo "❌ ERROR: Failed to clone the repository."
+    echo "======================================================"
+    echo 
+    echo "Please try the direct method:"
+    echo "git clone https://oauth2:${TOKEN}@github.com/$PRIVATE_REPO $TARGET_DIR"
+    echo 
+    echo "If that fails, contact your system administrator."
+    echo "======================================================"
     exit 1
 fi
-
-echo ""
-echo "======================================================"
-echo "✅ Shared tools repository successfully connected!"
-echo "======================================================"
-echo ""
-echo "REPOSITORY: kaut-shared (private)"
-echo "LOCATION: $SHARED_DIR"
-echo "DOCUMENTATION: $SHARED_DIR/docs/README.md"
-echo ""
-echo "Next steps:"
-echo "1. Read $SHARED_DIR/docs/README.md for setup instructions"
-echo "2. Set up aliases for context management tools:"
-echo "   source $SHARED_DIR/bin/setup_aliases.sh"
-echo "3. Test context management tools using the /pc and /ac commands"
-echo ""
-echo "For more information, check $SHARED_DIR/docs/GETTING_STARTED.md"
-echo "======================================================"
 
 exit 0
