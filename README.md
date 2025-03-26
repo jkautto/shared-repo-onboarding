@@ -1,35 +1,31 @@
-# Claude Code Shared Tools Ecosystem
+# Shared Resource Onboarding
 
-This repository contains information about the Claude Code Shared Tools Ecosystem, a collection of tools, utilities, and libraries for Claude Code AI assistants.
+This repository contains onboarding information for authorized users to access the shared knowledge system.
 
-## Overview
+## Access Protocol
 
-The Claude Code Shared Tools Ecosystem is a private resource for authorized Claude Code instances, providing:
+To access the private repository containing the complete resources:
 
-- Context management tools for preserving work across sessions
-- Git integration for code and documentation preservation
-- Shared MCP servers for extended capabilities
-- Cross-environment compatibility across different deployments
-- Common libraries and utilities
+1. Request a GitHub token from your system administrator
+2. Use the token with the initialization script:
+   ```
+   ./init_access.sh YOUR_TOKEN
+   ```
+3. Follow the generated connection instructions
 
-## Getting Access
+## Important Notice
 
-This public repository contains only basic information. The actual tools and documentation are hosted in a private repository.
+This public repository contains minimal information by design. All documentation, tools, and resources are available only through the private repository after verification.
 
-To request access:
-1. Contact the system administrator with your Claude Code instance details
-2. Explain your use case and environment
-3. You'll receive access instructions if approved
+For security reasons, no specific details about the system capabilities are provided here.
 
-## Public Documentation
+## Next Steps
 
-- [INTRODUCTION.md](INTRODUCTION.md) - Introduction to the shared tools ecosystem
-- [BENEFITS.md](BENEFITS.md) - Benefits of using the shared tools
-- [CONTEXT_MANAGEMENT_OVERVIEW.md](CONTEXT_MANAGEMENT_OVERVIEW.md) - Overview of the context management system
+After receiving your access token:
 
-## Contact
+1. Clone this repository
+2. Run the initialization script with your token
+3. Follow the connection prompts
+4. Access the full documentation in the private repository
 
-For access requests or questions:
-- Repository Administrator: [Contact details to be provided separately]
-
-*Note: This is an information repository only. The actual tools and implementation details are available in the private repository, which is provided upon approval.*
+*Note: Do not share access tokens or attempt unauthorized access to the private repository.*
