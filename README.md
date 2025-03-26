@@ -1,49 +1,70 @@
-# Shared Resource Onboarding
+# Shared Tools Access
 
-This repository provides the necessary tools to access the Kaut.to shared development resources and tools.
+**IMPORTANT: This repository contains ONLY the access instructions.**
 
-## Access Protocol
+The actual shared tools are in the private repository at https://github.com/jkautto/kaut-shared.
 
-To access the private repository containing the complete resources:
+## Quick Start (TL;DR)
 
-1. Request a GitHub token from your system administrator with access to `jkautto/kaut-shared`
-2. Clone this repository:
-   ```
+Run this to get immediate access (requires git and curl):
+
+```bash
+# Replace YOUR_TOKEN with your GitHub token
+git clone https://github.com/jkautto/shared-repo-onboarding.git
+cd shared-repo-onboarding
+chmod +x init_access.sh
+./init_access.sh YOUR_TOKEN
+```
+
+## What Is This?
+
+This repository contains ONLY the initialization script to access the shared tools. The actual tools repository is https://github.com/jkautto/kaut-shared (private).
+
+## Step by Step Instructions
+
+1. **Request a token** from your system administrator with access to the jkautto/kaut-shared repository
+
+2. **Clone this repository**:
+   ```bash
    git clone https://github.com/jkautto/shared-repo-onboarding.git
    cd shared-repo-onboarding
    ```
-3. Use the token with the initialization script:
-   ```
+
+3. **Make the script executable**:
+   ```bash
    chmod +x init_access.sh
+   ```
+
+4. **Run the script with your token**:
+   ```bash
    ./init_access.sh YOUR_TOKEN
    ```
-4. Follow the setup instructions in the cloned repository
+   This will:
+   - Verify your token has access to the private repository
+   - Clone the private repository to ./kaut-shared-tools
+   - Display next steps
 
-## What You'll Get Access To
+5. **Follow the setup instructions** in the cloned repository
 
-The private repository (`jkautto/kaut-shared`) contains:
+## If the Script Doesn't Work
 
-- Context management tools (`/pc`, `/ac`, `/hk`) for preserving work across sessions
-- Shared utilities for efficient system maintenance
+If you're having trouble with the initialization script, you can directly clone the repository:
+
+```bash
+# Replace YOUR_TOKEN with your GitHub token
+git clone https://YOUR_TOKEN@github.com/jkautto/kaut-shared.git kaut-shared-tools
+```
+
+## What's in the Private Repository?
+
+The private repository (jkautto/kaut-shared) contains:
+
+- Context management tools (/pc, /ac, /hk) for preserving work across sessions
+- Shared utilities for system maintenance
 - Documentation templates and guidelines
-- Reference implementations for common tasks
+- Reference implementations
 - Shared MCP server configurations
 
-## Important Notice
+## Need Help?
 
-This public repository contains only the onboarding script. All documentation, tools, and resources are available only in the private repository after verification.
-
-For security reasons, no specific details about the system capabilities are provided here.
-
-## Technical Requirements
-
-- Git client
-- Bash shell
-- GitHub access token with appropriate permissions
-- curl
-
-## Support
-
-If you encounter issues with the onboarding process, please contact your system administrator.
-
-*Note: Do not share access tokens or attempt unauthorized access to the private repository.*
+Contact your system administrator if you encounter issues.
