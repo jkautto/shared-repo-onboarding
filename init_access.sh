@@ -12,22 +12,48 @@ fi
 TOKEN=$1
 
 echo "Verifying access credentials..."
-echo "Connecting to private repository..."
+# Verify token has access to the repository
+curl -s -o /dev/null -w "%{http_code}" -H "Authorization: token $TOKEN" https://api.github.com/repos/jkautto/kaut-shared > /tmp/curl_response.txt
+RESPONSE=$(cat /tmp/curl_response.txt)
+rm /tmp/curl_response.txt
 
-# This would typically validate the token and provide access to the private repo
-# For security, no actual repository URLs are included in this script
+if [ "$RESPONSE" != "200" ]; then
+    echo "Error: Invalid token or repository access denied"
+    echo "HTTP response: $RESPONSE"
+    exit 1
+fi
 
-echo "Access verification complete."
-echo "Connecting to shared resource repository..."
-echo "Access granted. See connection details below:"
-echo "------------------------------------------"
-echo "REPOSITORY: shared-knowledge-base (private)"
-echo "ACCESS LEVEL: Read-only"
-echo "DOCUMENTATION PATH: /docs/ONBOARDING.md"
-echo "------------------------------------------"
-echo "Follow the instructions in ONBOARDING.md to complete setup."
+echo "Access verified successfully."
+echo "Cloning shared tools repository..."
 
-# This script would normally clone or provide access to the private repository
-# The actual implementation would be in the private repository
+# Create a target directory for the repository
+SHARED_DIR="./kaut-shared-tools"
+mkdir -p $SHARED_DIR
+
+# Clone the repository using the token
+git clone https://oauth2:${TOKEN}@github.com/jkautto/kaut-shared.git $SHARED_DIR
+
+if [ $? -ne 0 ]; then
+    echo "Error: Failed to clone repository"
+    exit 1
+fi
+
+echo ""
+echo "======================================================"
+echo "✅ Shared tools repository successfully connected!"
+echo "======================================================"
+echo ""
+echo "REPOSITORY: kaut-shared (private)"
+echo "LOCATION: $SHARED_DIR"
+echo "DOCUMENTATION: $SHARED_DIR/docs/README.md"
+echo ""
+echo "Next steps:"
+echo "1. Read $SHARED_DIR/docs/README.md for setup instructions"
+echo "2. Set up aliases for context management tools:"
+echo "   source $SHARED_DIR/bin/setup_aliases.sh"
+echo "3. Test context management tools using the /pc and /ac commands"
+echo ""
+echo "For more information, check $SHARED_DIR/docs/GETTING_STARTED.md"
+echo "======================================================"
 
 exit 0
