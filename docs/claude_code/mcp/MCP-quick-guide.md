@@ -98,6 +98,78 @@ echo "Ended: $(date)" >> "$logfile"
 | Permissions errors | Set chmod 777 for log dirs, chmod 666 for log files |
 | Multiple fails | Clean all servers, register one at a time |
 | Response not received | Add newline and explicit flush after responses |
+| All servers fail after reset | Start a new Claude session and approve servers |
+| Servers persist after removal | Check all scopes (local, project, user) |
+| Conflicting server definitions | Keep configurations in a single scope |
+| Project scope not working | Ensure .mcp.json is valid and approved |
+
+## MCP Server Scope Management
+
+MCP servers can be registered in three different scopes, which affects their visibility and persistence:
+
+### Scope Types
+
+1. **Local Scope** (default)
+   - Only visible in the current project for the current user
+   - Registered with: `claude mcp add server-name /path/to/executable`
+   - Listed with: `claude mcp list`
+   - Removed with: `claude mcp remove server-name`
+
+2. **Project Scope** (via .mcp.json)
+   - Shared with all users of the project through version control
+   - Added to .mcp.json automatically with: `claude mcp add server-name /path/to/executable -s project`
+   - Requires user approval on first use
+   - Reset approvals with: `claude mcp reset-project-choices`
+
+3. **User Scope** (formerly global)
+   - Available to the current user across all projects
+   - Registered with: `claude mcp add server-name /path/to/executable -s user`
+   - Listed with: `claude mcp list -s user`
+   - Removed with: `claude mcp remove server-name -s user`
+
+### Scope Priority
+
+When MCP servers with the same name exist in multiple scopes:
+1. Local scope servers take precedence over project scope
+2. Project scope servers take precedence over user scope
+
+### Troubleshooting Scope Issues
+
+If you're experiencing issues with MCP servers after making changes:
+
+1. **Check All Scopes**
+   ```bash
+   # Check local scope
+   claude mcp list
+   
+   # Check user scope
+   claude mcp list -s user
+   
+   # Check project scope
+   ls -la .mcp.json
+   ```
+
+2. **Clean All Scopes**
+   ```bash
+   # Remove specific server from all scopes
+   claude mcp remove server-name -s local
+   claude mcp remove server-name -s user
+   
+   # Backup and remove project scope configuration
+   mv .mcp.json .mcp.json.bak
+   
+   # Reset project choices
+   claude mcp reset-project-choices
+   ```
+
+3. **Start Fresh with Local Scope Only**
+   ```bash
+   # Register the server in local scope
+   claude mcp add server-name /path/to/executable
+   
+   # Start Claude with extended timeout
+   MCP_TIMEOUT=60000 claude --mcp-debug
+   ```
 
 ## Troubleshooting Steps
 

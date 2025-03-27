@@ -984,6 +984,64 @@ After extensive investigation of the MCP connection issues, we've identified sev
    - Proper error reporting through JSON-RPC error responses
    - Graceful process termination
 
+## MCP Server Scope Issues (2025-03-27)
+
+During our troubleshooting of the perplexity server, we encountered issues related to MCP server scopes:
+
+1. **Scope Confusion**: Claude MCP servers can be registered in multiple scopes:
+   - **Local scope** (default): Only available in the current project for the current user
+   - **Project scope** (via .mcp.json): Shared with all users of the project
+   - **User scope** (formerly global): Available to the current user across all projects
+
+2. **Project Scope Approval**: Project-scoped servers in .mcp.json require approval:
+   - Users must approve project-scoped servers when first starting Claude
+   - Running `claude mcp reset-project-choices` removes these approvals
+   - After reset, Claude will prompt for approval on next run
+
+3. **Scope Priority**: When servers with the same name exist in multiple scopes:
+   - Local scope takes precedence over project scope
+   - Project scope takes precedence over user scope
+   - This can lead to confusion when multiple configurations exist
+
+4. **Configuration Persistence**: MCP configurations persist across different approaches:
+   - Local and user scope configurations are stored in user settings
+   - Project scope configurations are stored in .mcp.json
+   - Running `reset-project-choices` only affects approval status, not the configuration itself
+
+5. **Restoration Steps After Project Choice Reset**:
+   - After running `reset-project-choices`, you must:
+     1. Start a new Claude session
+     2. Approve the project-scoped servers when prompted
+     3. Check status with `/mcp`
+
+6. **Fixing Persistent Configuration Issues**:
+   - Rename .mcp.json to remove project scope configuration
+   - Remove servers from all scopes explicitly:
+     ```bash
+     # Remove from local scope
+     claude mcp remove server-name -s local
+     
+     # Remove from user scope
+     claude mcp remove server-name -s user
+     
+     # Reset project choices
+     claude mcp reset-project-choices
+     ```
+
+7. **Best Practice for MCP Server Management**:
+   - Keep server configurations in a single scope to avoid conflicts
+   - Document which scope each server is registered in
+   - When troubleshooting, check all scopes:
+     ```bash
+     claude mcp list         # Local scope
+     claude mcp list -s user # User scope
+     ls -la .mcp.json        # Project scope
+     ```
+   - After making significant changes, restart Claude with extended timeout:
+     ```bash
+     MCP_TIMEOUT=60000 claude --mcp-debug
+     ```
+
 ## New MCP Management System (2025-03-27)
 
 To simplify the process of troubleshooting and managing MCP servers, we've created a comprehensive management script that provides a consistent interface for all MCP-related operations:
